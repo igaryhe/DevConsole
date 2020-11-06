@@ -1,0 +1,23 @@
+{
+  "name": "io.igaryhe.devconsole",
+  "version": "0.0.1",
+  "displayName": "Dev Console",
+  "description": "Extensible in-game dev console",
+  "unity": "2019.4",
+  "unityRelease": "9f1",
+  "dependencies": {
+    "com.unity.inputsystem": "1.0.0",
+    "com.unity.textmeshpro": "2.1.1",
+    "com.unity.ugui": "1.0.0"
+  },
+  "keywords": [
+    "tool",
+    "debug"
+  ],
+  "author": {
+    "name": "Dan",
+    "email": "igaryhe@gmail.com",
+    "url": "https://www.igaryhe.io"
+  },
+  "type": "template"
+}
