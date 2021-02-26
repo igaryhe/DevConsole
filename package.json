@@ -1,6 +1,6 @@
 {
   "name": "io.igaryhe.devconsole",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "DevConsole",
   "description": "Extensible in-game dev console",
   "unity": "2019.4",

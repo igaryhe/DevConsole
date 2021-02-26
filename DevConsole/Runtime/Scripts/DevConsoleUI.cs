@@ -45,9 +45,9 @@ namespace DevConsole
 
         private static (string, string[]) ParseCommand(string input)
         {
-            var inputSplit = input.Split(' ');
-            var command = inputSplit[0];
-            var args = inputSplit.Skip(1).ToArray();
+            var split = input.Split(' ');
+            var command = split[0];
+            var args = split.Skip(1).ToArray();
             return (command, args);
         }
     }
