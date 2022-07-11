@@ -7,10 +7,10 @@ namespace DevConsole
 {
     internal static class DevConsole
     {
-        private static Dictionary<string, MethodInfo> _methodInfoCache;
+        private static Dictionary<string, MethodInfo> methodInfoCache;
         internal static void RegisterCommands()
         {
-            _methodInfoCache = AppDomain.CurrentDomain.GetAssemblies()
+            methodInfoCache = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(assembly => !assembly.IsDynamic)
                 .SelectMany(assembly => assembly.GetExportedTypes())
                 .SelectMany(type => type.GetMethods(BindingFlags.Static | BindingFlags.Public))
@@ -21,12 +21,12 @@ namespace DevConsole
 
         public static void ExecuteCommand(string methodName, params string[] args)
         {
-            if (_methodInfoCache == null || !_methodInfoCache.ContainsKey(methodName))
+            if (methodInfoCache == null || !methodInfoCache.ContainsKey(methodName))
             {
                 DevConsoleUI.Instance.LogError($"{methodName}: Not registered.");
                 return;
             }
-            var methodInfo = _methodInfoCache[methodName];
+            var methodInfo = methodInfoCache[methodName];
             var parametersInfo = methodInfo.GetParameters();
             if (parametersInfo.Length != args.Length)
             {

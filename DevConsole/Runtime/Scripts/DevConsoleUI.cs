@@ -1,59 +1,73 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using UnityEngine.InputSystem;
-using static System.String;
+using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace DevConsole
 {
     public class DevConsoleUI : Singleton<DevConsoleUI>
     {
-        private TextMeshProUGUI _output;
-        private TMP_InputField _input;
-        private List<string> _history;
-        private int _backlogIdx;
+        private TextMeshProUGUI output;
+        private TMP_InputField input;
+        private List<string> history;
+        private int backlogIdx;
 
         public DevConsoleUI()
         {
-            _history = new List<string>();
+            history = new List<string>();
             DevConsole.RegisterCommands();
         }
 
-        private void Start()
+        private void Awake()
         {
-            _output = GetComponentInChildren<TextMeshProUGUI>();
-            _input = GetComponentInChildren<TMP_InputField>();
+            output = GetComponentInChildren<TextMeshProUGUI>();
+            input = GetComponentInChildren<TMP_InputField>();
         }
 
-        private void Update()
+        private void OnEnable()
         {
-            if (Keyboard.current.enterKey.wasPressedThisFrame) ExecuteCommand(_input.text);
-            else if (Keyboard.current.upArrowKey.wasPressedThisFrame)
-            {
-                if (_backlogIdx < 0) return;
-                _input.text = _history[_backlogIdx];
-                if (_backlogIdx > 0) _backlogIdx--;
-            } else if (Keyboard.current.downArrowKey.wasPressedThisFrame)
-            {
-                if (_backlogIdx > _history.Count - 1) return;
-                _input.text = _history[_backlogIdx];
-                if (_backlogIdx < _history.Count - 1) _backlogIdx++;
-            }
+            input.ActivateInputField();
+            input.caretWidth = 12;
         }
 
-        public void Log(string message) => _output.text += $"{message}\n";
-        public void LogWarning(string message) => _output.text += $"<color=yellow>{message}</color>\n";
-        public void LogError(string message) => _output.text += $"<color=red>{message}</color>\n";
-
-        private void ExecuteCommand(string input)
+        private void OnDisable()
         {
-            var (command, args) = ParseCommand(input);
-            _history.Add(input);
-            _backlogIdx = _history.Count - 1;
-            Log($"> {input}");
+            input.DeactivateInputField();
+            EventSystem.current.SetSelectedGameObject(null);
+        }
+
+        public void Execute() => ExecuteCommand(input.text);
+
+        public void Up()
+        {
+            if (backlogIdx < 0) return;
+            input.text = history[backlogIdx];
+            if (backlogIdx > 0) backlogIdx--;
+            input.caretPosition = input.text.Length;
+        }
+
+        public void Down()
+        {
+            if (backlogIdx > history.Count - 1) return;
+            input.text = history[backlogIdx];
+            if (backlogIdx < history.Count - 1) backlogIdx++;
+            input.caretPosition = input.text.Length;
+        }
+
+        public void Log(string message) => output.text += $"{message}\n";
+        public void LogWarning(string message) => output.text += $"<color=yellow>{message}</color>\n";
+        public void LogError(string message) => output.text += $"<color=red>{message}</color>\n";
+
+        private void ExecuteCommand(string cmd)
+        {
+            var (command, args) = ParseCommand(cmd);
+            history.Add(cmd);
+            backlogIdx = history.Count - 1;
+            Log($"> {cmd}");
             DevConsole.ExecuteCommand(command, args);
-            _input.text = Empty;
-            _input.ActivateInputField();
+            input.text = "";
+            input.ActivateInputField();
         }
 
         private static (string, string[]) ParseCommand(string input)
