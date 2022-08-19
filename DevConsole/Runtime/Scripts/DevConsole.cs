@@ -23,14 +23,14 @@ namespace DevConsole
         {
             if (methodInfoCache == null || !methodInfoCache.ContainsKey(methodName))
             {
-                DevConsoleUI.Instance.LogError($"{methodName}: Not registered.");
+                DevConsoleUI.LogError($"{methodName}: Not registered.");
                 return;
             }
             var methodInfo = methodInfoCache[methodName];
             var parametersInfo = methodInfo.GetParameters();
             if (parametersInfo.Length != args.Length)
             {
-                DevConsoleUI.Instance.LogError($"{methodName}: Requires {parametersInfo.Length} args, while {args.Length} were provided.");
+                DevConsoleUI.LogError($"{methodName}: Requires {parametersInfo.Length} args, while {args.Length} were provided.");
                 return;
             }
             var parameters = new object[parametersInfo.Length];
@@ -43,7 +43,7 @@ namespace DevConsole
             }
             catch (FormatException)
             {
-                DevConsoleUI.Instance.LogError($"{methodName}: Parameters type error.");
+                DevConsoleUI.LogError($"{methodName}: Parameters type error.");
             }
         }
     }

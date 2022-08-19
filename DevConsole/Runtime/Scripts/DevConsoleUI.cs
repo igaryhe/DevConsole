@@ -85,9 +85,9 @@ namespace DevConsole
             input.caretPosition = input.text.Length;
         }
 
-        public void Log(string message) => output.text += $"{message}\n";
-        public void LogWarning(string message) => output.text += $"<color=yellow>{message}</color>\n";
-        public void LogError(string message) => output.text += $"<color=red>{message}</color>\n";
+        public static void Log(string message) => Instance.output.text += $"{message}\n";
+        public static void LogWarning(string message) => Instance.output.text += $"<color=yellow>{message}</color>\n";
+        public static void LogError(string message) => Instance.output.text += $"<color=red>{message}</color>\n";
 
         private void ExecuteCommand(string cmd)
         {
