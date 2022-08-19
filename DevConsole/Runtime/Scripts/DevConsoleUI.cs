@@ -9,9 +9,13 @@ namespace DevConsole
     public class DevConsoleUI : Singleton<DevConsoleUI>
     {
         private TextMeshProUGUI output;
+        private Canvas canvas;
         private TMP_InputField input;
         private List<string> history;
         private int backlogIdx;
+
+        public bool isOpened => canvas.enabled;
+        public bool justClosed; // a dirty hack
 
         public DevConsoleUI()
         {
@@ -19,25 +23,51 @@ namespace DevConsole
             DevConsole.RegisterCommands();
         }
 
-        private void Awake()
+        protected override void Awake()
         {
             output = GetComponentInChildren<TextMeshProUGUI>();
             input = GetComponentInChildren<TMP_InputField>();
-        }
-
-        private void OnEnable()
-        {
-            input.ActivateInputField();
+            canvas = GetComponent<Canvas>();
             input.caretWidth = 12;
+            input.onValueChanged.AddListener(delegate{ OnValueChanged(); });
+            input.onSubmit.AddListener(delegate{ ExecuteCommand(input.text); });
         }
 
-        private void OnDisable()
+        public void Toggle()
         {
+            canvas.enabled = !canvas.enabled;
+            if (canvas.enabled)
+            {
+                input.ActivateInputField();
+            }
+            else
+            {
+                input.DeactivateInputField();
+                EventSystem.current.SetSelectedGameObject(null);
+            }
+        }
+
+        private void Hide()
+        {
+            input.text = "";
             input.DeactivateInputField();
             EventSystem.current.SetSelectedGameObject(null);
+            canvas.enabled = false;
+            justClosed = true;
         }
 
-        public void Execute() => ExecuteCommand(input.text);
+        private void OnValueChanged()
+        {
+            if (input.text.Length == 0 || input.text.Last() != '`') return;
+            if (input.text == "`")
+            {
+                Hide();
+                return;
+            }
+            input.text = input.text[..^1];
+            ExecuteCommand(input.text);
+            Hide();
+        }
 
         public void Up()
         {
